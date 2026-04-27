@@ -8,8 +8,11 @@ using System.Windows.Forms;
 
 namespace or_data_check
 {
+    //skąd wybór .NET Framework i to jeszcze nie najnowszy? dlaczego nie .net Core? 
+
     public partial class Form1 : Form
     {
+        //TO POWINNO BYĆ W KONFIGURACJI
         private string connectionString = "Server=localhost;Database=testowa_baza;Trusted_Connection=True;TrustServerCertificate=True;";
         private string filePath = "transactionDump_2026-02-10_2026_03_03_FULL.xlsx";
 
@@ -35,6 +38,7 @@ namespace or_data_check
 
             try
             {
+                //OD RAZU WYNIEŚ OBSŁUGĘ PLIKU EXCEL DO ODDZIELNEJ KLASY, KTÓRA BĘDZIE ODPOWIEDZIALNA ZA WSZELKIE OPERACJE NA PLIKU EXCEL
                 using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
                     var ws = package.Workbook.Worksheets[0];
@@ -72,8 +76,20 @@ namespace or_data_check
         {
             try
             {
+                //OD RAZU WYNIEŚ OBSŁUGĘ BAZY DANYCH DO ODDZIELNEJ KLASY, KTÓRA BĘDZIE ODPOWIEDZIALNA ZA WSZELKIE OPERACJE NA BAZIE DANYCH
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
+                    //w rzeczywistości będzie baza danych z takimi kolumnami (przynajmniej z tymi istotnymi):
+                    //UniqueLineId varchar(50) - to będzie CONCAT(EXPENDITURE_ITEM_ID, 'SEGMENT3')
+                    //TransactionId - to będzie równ EEPENDITURE_ITEM_ID
+                    //TransactionAmount decimal(18,2) 
+                    //AccountingAmount decimal(18,2) 
+                    //ReportingAmount decimal(18,2) 
+
+                    //wierszy w bazie danych jest obecnie około 5mln i liczba szybko rośnie, więc jakby co to nie próbuj pobierać wszystkich :)
+                    
+
+
                     string query = "SELECT TOP 10 EXPENDITURE_ITEM_ID, EXPENDITURE_TYPE_NAME, PROJECT_NUM, PROJFUNC_BURDENED_COST FROM [dbo].[ExpenditureTransactions]";
 
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
