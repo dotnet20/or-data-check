@@ -6,12 +6,12 @@ namespace or_data_check
 {
     public partial class Form1 : Form
     {
-        private readonly ExcelService _excelService;
-        private readonly DatabaseService _databaseService;
+        private readonly ExcelService _excelService; //IExcelService
+        private readonly DatabaseService _databaseService; //IDatabaseService
 
         private readonly string _filePath;
 
-        public Form1()
+        public Form1(/*IExcelService excelService, IDatabaseService databaseService*/)
         {
             InitializeComponent();
 
@@ -21,6 +21,10 @@ namespace or_data_check
             _filePath = ConfigurationManager.AppSettings["ExcelFilePath"]
                 ?? throw new Exception("No path to excel file in configuration.");
 
+            //nie koduj do konkretnej implementacji;
+            //użyj abstrakcji i wstrzyknij zależność przez kontener DependencyInjection (jak przejdziesz na aktualnego .neta to będziesz miał wbudowanego, w .net Frameworku trzeba by dodać zewnętrzną bibliotekę - np NInject)
+            //- dziś użyjeż EPPlus, a jutro może sie okazać że jednak trzeba przejść na inną kontrolke
+            //wtedy będzie trzeba zmieniać wszystkie miejsca, gdzie EPPlus był użyty
             _excelService = new ExcelService();
             _databaseService = new DatabaseService(connectionString);
         }

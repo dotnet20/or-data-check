@@ -19,15 +19,18 @@ namespace or_data_check
             string query = "SELECT TOP (@Limit) * FROM [dbo].[ExpenditureTransactions]";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                cmd.Parameters.AddWithValue("@Limit", limit);
-
-                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                using (SqlCommand cmd = new SqlCommand(query, conn)) //command nie potrzebuje usinga, to connection wymaga zamknięcia  (stosując using, kompilator doda try-finally z kodem wywołującym close i dispose
                 {
-                    adapter.Fill(dt);
+                    cmd.Parameters.AddWithValue("@Limit", limit);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
                 }
             }
+            
 
             return dt;
         }
