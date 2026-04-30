@@ -1,7 +1,5 @@
 ﻿using OfficeOpenXml;
-using System;
 using System.Data;
-using System.IO;
 
 namespace or_data_check
 {
