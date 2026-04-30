@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace or_data_check
 {
-    public class DatabaseService
+    public class DatabaseService : IDatabaseService
     {
         private readonly string _connectionString;
 
@@ -15,22 +15,16 @@ namespace or_data_check
         public DataTable GetTransactions(int limit = 10)
         {
             DataTable dt = new DataTable();
-
             string query = "SELECT TOP (@Limit) * FROM [dbo].[ExpenditureTransactions]";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand(query, conn)) //command nie potrzebuje usinga, to connection wymaga zamknięcia  (stosując using, kompilator doda try-finally z kodem wywołującym close i dispose
-                {
-                    cmd.Parameters.AddWithValue("@Limit", limit);
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Limit", limit);
 
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
-                    {
-                        adapter.Fill(dt);
-                    }
-                }
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(dt);
             }
-            
 
             return dt;
         }

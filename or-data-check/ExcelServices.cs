@@ -3,7 +3,7 @@ using System.Data;
 
 namespace or_data_check
 {
-    public class ExcelService
+    public class ExcelService : IExcelService
     {
         public ExcelService()
         {
@@ -22,6 +22,8 @@ namespace or_data_check
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
                 var ws = package.Workbook.Worksheets[0];
+                if (ws.Dimension == null) return dt;
+
                 int rows = ws.Dimension.Rows;
                 int cols = Math.Min(maxCols, ws.Dimension.Columns);
 
