@@ -69,7 +69,7 @@ namespace or_data_check
             var dbKeys = clbDbColumns.CheckedItems.Cast<string>().ToList();
             var valCols = clbValueColumns.CheckedItems.Cast<string>().ToList();
 
-            if (excelKeys.Count != dbKeys.Count || excelKeys.Count == 0)
+            if (excelKeys.Count != dbKeys.Count || excelKeys.Count == 0) //nieprawidłowe założenia  dbKeys powinien być 1
             {
                 MessageBox.Show("Please select the same number of ID columns in both lists!");
                 return;

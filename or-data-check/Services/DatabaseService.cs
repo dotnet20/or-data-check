@@ -13,8 +13,7 @@ namespace or_data_check.Services
             _connectionString = connectionString;
         }
 
-        public DataTable GetTransactions(int limit = 10)
-        {
+        public DataTable GetTransactions(int limit = 10)         {
             DataTable dt = new DataTable();
             string query = "SELECT TOP (@Limit) * FROM [dbo].[ExpenditureTransactions]";
 
