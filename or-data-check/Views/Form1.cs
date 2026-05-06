@@ -16,7 +16,7 @@ namespace or_data_check
             InitializeComponent();
             _excelService = excelService;
             _databaseService = databaseService;
-            _comparisonService = new ComparisonService();
+            _comparisonService = new ComparisonService(); // ten serwis te¿ powinien byæ wstrzykniêty
             _filePath = filePath;
         }
 
@@ -30,10 +30,10 @@ namespace or_data_check
         {
             try
             {
-                DataTable dt = _excelService.LoadData(_filePath, maxRows: 10, maxCols: 50);
+                DataTable dt = _excelService.LoadData(_filePath, maxRows: 10, maxCols: 50); //nie u¿ywa siê nazw zmiennych, które nic nie mówi¹ jak dt, wiêcej powie firstTenRowsFromExcel
                 dgvExcel.DataSource = dt;
 
-                clbKeyColumns.Items.Clear();
+                clbKeyColumns.Items.Clear(); //tu tak samo nazwa jest taka, ¿e jak ktos poza tob¹ to przegl¹da to nie wie o co chodzi. clbKeyColumns - to powinno byæ cos znacz¹cego np idColumnList
                 clbValueColumns.Items.Clear();
                 foreach (DataColumn col in dt.Columns)
                 {
