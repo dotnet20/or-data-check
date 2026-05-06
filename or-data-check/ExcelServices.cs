@@ -30,7 +30,7 @@ namespace or_data_check
                 for (int c = 1; c <= cols; c++)
                 {
                     string colName = ws.Cells[1, c].Text;
-                    dt.Columns.Add(string.IsNullOrWhiteSpace(colName) ? $"Kolumna {c}" : colName);
+                    dt.Columns.Add(string.IsNullOrWhiteSpace(colName) ? $"Kolumna {c}" : colName); // Kolumna ?
                 }
 
                 for (int r = 2; r <= Math.Min(maxRows + 1, rows); r++)
