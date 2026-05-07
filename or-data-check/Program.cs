@@ -27,6 +27,7 @@ namespace or_data_check
             services.AddTransient(provider => new Form1(
                 provider.GetRequiredService<IExcelService>(),
                 provider.GetRequiredService<IDatabaseService>(),
+                provider.GetRequiredService<ComparisonService>(),
                 excelPath
             ));
 

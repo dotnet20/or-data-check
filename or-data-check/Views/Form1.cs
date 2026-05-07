@@ -11,12 +11,12 @@ namespace or_data_check
         private readonly ComparisonService _comparisonService;
         private readonly string _filePath;
 
-        public Form1(IExcelService excelService, IDatabaseService databaseService, string filePath)
+        public Form1(IExcelService excelService, IDatabaseService databaseService, ComparisonService comparisonService, string filePath)
         {
             InitializeComponent();
             _excelService = excelService;
             _databaseService = databaseService;
-            _comparisonService = new ComparisonService(); // ten serwis te¿ powinien byæ wstrzykniêty
+            _comparisonService = comparisonService;
             _filePath = filePath;
         }
 
@@ -30,15 +30,16 @@ namespace or_data_check
         {
             try
             {
-                DataTable dt = _excelService.LoadData(_filePath, maxRows: 10, maxCols: 50); //nie u¿ywa siê nazw zmiennych, które nic nie mówi¹ jak dt, wiêcej powie firstTenRowsFromExcel
-                dgvExcel.DataSource = dt;
+                DataTable firstTenRowsFromExcel = _excelService.LoadData(_filePath, maxRows: 10, maxCols: 50);
+                dgvExcel.DataSource = firstTenRowsFromExcel;
 
-                clbKeyColumns.Items.Clear(); //tu tak samo nazwa jest taka, ¿e jak ktos poza tob¹ to przegl¹da to nie wie o co chodzi. clbKeyColumns - to powinno byæ cos znacz¹cego np idColumnList
-                clbValueColumns.Items.Clear();
-                foreach (DataColumn col in dt.Columns)
+                excelIdColumnList.Items.Clear();
+                excelValueColumnList.Items.Clear();
+
+                foreach (DataColumn column in firstTenRowsFromExcel.Columns)
                 {
-                    clbKeyColumns.Items.Add(col.ColumnName);
-                    clbValueColumns.Items.Add(col.ColumnName);
+                    excelIdColumnList.Items.Add(column.ColumnName);
+                    excelValueColumnList.Items.Add(column.ColumnName);
                 }
             }
             catch (Exception ex)
@@ -51,11 +52,14 @@ namespace or_data_check
         {
             try
             {
-                DataTable dt = _databaseService.GetTransactions(limit: 10);
-                dgvDatabase.DataSource = dt;
+                DataTable firstTenRowsFromDb = _databaseService.GetTransactions(limit: 10);
+                dgvDatabase.DataSource = firstTenRowsFromDb;
 
-                clbDbColumns.Items.Clear();
-                foreach (DataColumn col in dt.Columns) clbDbColumns.Items.Add(col.ColumnName);
+                dbIdColumnList.Items.Clear();
+                foreach (DataColumn column in firstTenRowsFromDb.Columns)
+                {
+                    dbIdColumnList.Items.Add(column.ColumnName);
+                }
             }
             catch (Exception ex)
             {
@@ -65,11 +69,11 @@ namespace or_data_check
 
         private void btnCompare_Click(object sender, EventArgs e)
         {
-            var excelKeys = clbKeyColumns.CheckedItems.Cast<string>().ToList();
-            var dbKeys = clbDbColumns.CheckedItems.Cast<string>().ToList();
-            var valCols = clbValueColumns.CheckedItems.Cast<string>().ToList();
+            var selectedExcelKeys = excelIdColumnList.CheckedItems.Cast<string>().ToList();
+            var selectedDbKeys = dbIdColumnList.CheckedItems.Cast<string>().ToList();
+            var selectedValueColumns = excelValueColumnList.CheckedItems.Cast<string>().ToList();
 
-            if (excelKeys.Count != dbKeys.Count || excelKeys.Count == 0)
+            if (selectedExcelKeys.Count != selectedDbKeys.Count || selectedExcelKeys.Count == 0)
             {
                 MessageBox.Show("Please select the same number of ID columns in both lists!");
                 return;
@@ -77,15 +81,21 @@ namespace or_data_check
 
             try
             {
-                DataTable excelData = _excelService.LoadData(_filePath, maxRows: 1000000);
-                DataTable dbData = _databaseService.GetTransactions(limit: 1000000);
+                DataTable fullExcelData = _excelService.LoadData(_filePath, maxRows: 1000000);
+                DataTable fullDatabaseData = _databaseService.GetTransactions(limit: 1000000);
 
-                var missing = _comparisonService.FindMissingRecords(excelData, dbData, excelKeys, dbKeys, valCols);
+                var missingRecords = _comparisonService.FindMissingRecords(
+                    fullExcelData,
+                    fullDatabaseData,
+                    selectedExcelKeys,
+                    selectedDbKeys,
+                    selectedValueColumns
+                );
 
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "missing_records.txt");
-                File.WriteAllLines(path, missing);
+                string resultFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "missing_records.txt");
+                File.WriteAllLines(resultFilePath, missingRecords);
 
-                MessageBox.Show($"Found {missing.Count} missing records.\n Saved to: {path}", "Success");
+                MessageBox.Show($"Found {missingRecords.Count} missing records.\nSaved to: {resultFilePath}", "Success");
             }
             catch (Exception ex)
             {
