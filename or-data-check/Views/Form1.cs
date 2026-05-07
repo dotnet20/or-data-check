@@ -73,7 +73,7 @@ namespace or_data_check
             var selectedDbKeys = dbIdColumnList.CheckedItems.Cast<string>().ToList();
             var selectedValueColumns = excelValueColumnList.CheckedItems.Cast<string>().ToList();
 
-            if (selectedExcelKeys.Count != selectedDbKeys.Count || selectedExcelKeys.Count == 0) //nieprawidłowe założenia  dbKeys powinien być 1
+            if (selectedExcelKeys.Count != selectedDbKeys.Count || selectedExcelKeys.Count == 0)
             {
                 MessageBox.Show("Please select the same number of ID columns in both lists!");
                 return;
