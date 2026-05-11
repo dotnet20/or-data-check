@@ -28,7 +28,8 @@ namespace or_data_check
                 int rows = worksheet.Dimension.Rows;
                 int cols = Math.Min(maxCols, worksheet.Dimension.Columns);
 
-                GenerateColumns(worksheet, dt, cols);
+                var columns = GenerateColumns(worksheet, cols);
+                dt.Columns.AddRange(columns.ToArray());
 
                 for (int r = 2; r <= Math.Min(maxRows + 1, rows); r++)
                 {
@@ -40,13 +41,17 @@ namespace or_data_check
             return dt;
         }
 
-        private void GenerateColumns(ExcelWorksheet worksheet, DataTable dt, int cols)
+        private List<DataColumn> GenerateColumns(ExcelWorksheet worksheet, int cols)
         {
+            List<DataColumn > columns = new List<DataColumn>();
+
             for (int c = 1; c <= cols; c++)
             {
                 string colName = worksheet.Cells[1, c].Text;
-                dt.Columns.Add(string.IsNullOrWhiteSpace(colName) ? $"Column {c}" : colName);
+                columns.Add(new DataColumn(string.IsNullOrWhiteSpace(colName) ? $"Column {c}" : colName));                
             }
+
+            return columns;
         }
 
         private DataRow CreateRow(ExcelWorksheet worksheet, DataTable dt, int rowIndex, int cols)
